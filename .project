@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<projectDescription>
+    <name>JCash</name>
+    <id>1376e98e-858d-4882-849d-3f069f524192</id>
+    <comment></comment>
+    <projects></projects>
+    <buildSpec></buildSpec>
+    <natures>
+        <nature>com.adobe.ide.coldfusion.projectNature</nature>
+    </natures>
+</projectDescription>

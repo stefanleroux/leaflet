@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bootstrap demo</title>
+    <link rel="stylesheet" href="leaflet/dist/leaflet.css" />
+    <script src="leaflet/dist/leaflet.js"></script>
+    <style>
+      #map { width: 100%; height: 550px; }
+    </style>
+    <script src="htmx/dist/htmx.min.js"></script>
+    <script src="js/jquery-3.7.1.min.js"></script>
+  </head>
+  <body>
+
+
+<!---
+hx-get="create_geojson.cfm" hx-trigger="load"
+--->
+
+    <div id="map"></div>
+
+    <script src="create_geojson.cfm" type="text/javascript"></script>
+
+<script>
+//var MARKERS_MAX = 4;
+
+var map = L.map( 'map').setView([-25.96088972,29.33496764], 14);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+}).addTo(map);
+
+
+function onEachFeature(feature, layer) {
+    // does this feature have a property named popupContent?
+    if (feature.properties && feature.properties.prefix) {
+        layer.bindPopup(feature.properties.prefix);
+    }
+}
+
+
+
+L.geoJSON(tower_line, {
+    onEachFeature: onEachFeature
+}).addTo(map);
+
+</script>

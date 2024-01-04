@@ -1,0 +1,12 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"preview-in-browser.removeStartString": "c:/lucee/tomcat/webapps/ROOT/",
+		"preview-in-browser.domain": "http://127.0.0.1:8888",
+		"preview-in-browser.browser": "chrome"
+	}
+}
