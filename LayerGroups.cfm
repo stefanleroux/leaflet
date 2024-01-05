@@ -46,11 +46,6 @@
    
     <style>
       #map { width: 750px; height: 250px; }
-
-
-      .selected_feature {
-          box-shadow: 0 0 1px 3px #C2CB00 !important;
-      }
     </style>
 
   </head>
@@ -60,7 +55,7 @@
 
 
 
-<div id="map" style="width:100%;height:400px;"></div>
+<div id="map" style="width:100%;height:500px;"></div>
 
 
 
@@ -77,21 +72,80 @@
 <script>
 
 
-    <cfoutput>
-        var lineLat = #middle_record.LAT#;
-        var lineLon = #middle_record.LONGX#;
-    </cfoutput>
+  <cfoutput>
+      var lineLat = #middle_record.LAT#;
+      var lineLon = #middle_record.LONGX#;
+  </cfoutput>
 
-    var map = L.map('map').setView([lineLat, lineLon], 25); // Set the initial center and zoom level
-    
-    var selection;
-    var selectedLayer;
-    var selectedFeature;
+  var map = L.map('map').setView([lineLat, lineLon], 14); // Set the initial center and zoom level
+  
+  var selection;
+  var selectedLayer;
+  var selectedFeature;
 
-    var geojsonSpanGroup = L.layerGroup().addTo(map);
-    var geojsonTowerGroup = L.layerGroup().addTo(map);
-    var geojsonLineGroup = L.layerGroup().addTo(map);
+  var geojsonLineGroup = L.layerGroup().addTo(map);
+  var geojsonSpanGroup = L.layerGroup().addTo(map);
+  var geojsonTowerGroup = L.layerGroup().addTo(map);
     
+    
+
+function onEachSpan(feature, layer) {
+  //console.log(layer);
+  // does this feature have a property named popupContent?
+  /*layer.on('click', function(e) {
+
+    selection = e.target;
+    selectedLayer = layer;
+    selectedFeature = feature;
+
+    //if(selectedFeature.filter())
+
+    e.target.feature.properties.selected = true;
+    e.target.setStyle({
+      stroke: true,
+      color: '#C2CB00',
+      weight: 7,
+      opacity: 0.7,
+    });
+    console.log(layer);
+    //L.DomEvent.stopPropagation(e);  
+  });*/
+  layer.setStyle({
+      stroke: true,
+      color: layer.feature.properties.color,
+      weight: 7,
+      opacity: 0.7,
+    });
+  geojsonSpanGroup.addLayer(layer);
+}
+
+
+function onEachTower(feature, layer) {
+  //console.log(layer);
+  // does this feature have a property named popupContent?
+  layer.bindPopup("Wow!");
+  geojsonTowerGroup.addLayer(layer);
+}
+
+function onEachLine(feature, layer) {
+  layer.on('click', function(e) {
+      e.target.setStyle({
+          stroke: true,
+          color: 'gold',
+          weight: 7,
+          opacity: 0.7,
+        });
+      //layer.bindPopup(feature.properties.LENGTH);
+      console.log(layer);
+      //L.DomEvent.stopPropagation(e);
+  });
+
+  geojsonLineGroup.addLayer(layer);
+  //var bounds = layer.getBounds();
+  //var latLng = bounds.getCenter();
+  //map.setView(latLng, 12.5);
+}
+
 // create and add osm tile layer
 var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   maxZoom: 19,
@@ -112,64 +166,9 @@ var OPNVKarte = L.tileLayer('https://tileserver.memomaps.de/tilegen/{z}/{x}/{y}.
 });
 
 
-function onEachSpan(feature, layer) {
-  //console.log(layer);
-  // does this feature have a property named popupContent?
-  layer.on('click', function(e) {
-
-    selection = e.target;
-    selectedLayer = layer;
-    selectedFeature = feature;
-
-    //if(selectedFeature.filter())
-
-    e.target.feature.properties.selected = true;
-    e.target.setStyle({
-      stroke: true,
-      color: '#C2CB00',
-      weight: 7,
-      opacity: 0.7,
-    });
-    console.log(layer);
-    L.DomEvent.stopPropagation(e);
-  });
-  layer.setStyle({
-      stroke: true,
-      color: feature.properties.span_color,
-      weight: 7,
-      opacity: 0.7,
-    });
-  geojsonSpanGroup.addLayer(layer);
-
-}
-
-function onEachTower(feature, layer) {
-  //console.log(layer);
-  // does this feature have a property named popupContent?
-  layer.bindPopup("Wow!");
-  geojsonTowerGroup.addLayer(layer);
-}
-
-function onEachPoint(feature, layer) {
-  layer.on('click', function(e) {
-      e.target.setStyle({
-          stroke: true,
-          color: 'gold',
-          weight: 7,
-          opacity: 0.7,
-        });
-      //layer.bindPopup(feature.properties.LENGTH);
-      L.DomEvent.stopPropagation(e);
-  });
-
-  geojsonLineGroup.addLayer(layer);
-  var bounds = layer.getBounds();
-  var latLng = bounds.getCenter();
-  map.setView(latLng, 12.5);
-}
 
 L.geoJSON(line, {
-  onEachFeature: onEachPoint
+  onEachFeature: onEachLine
 }).addTo(map);
 
 L.geoJSON(towers, {
