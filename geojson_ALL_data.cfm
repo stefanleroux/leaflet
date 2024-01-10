@@ -1,5 +1,5 @@
 
-<cfparam name="URL.pl_number" type="numeric" default="280" />
+<cfparam name="URL.pl_number" type="numeric" default="8" />
 
 <cfquery name="qTower" datasource="postgis">
 SELECT
@@ -27,18 +27,28 @@ ORDER BY
     "TOWER_NO"
 </cfquery>
 
+<!---
+<cfdump var="#qTower#">
+<cfabort>
+--->
+
 
 <cfset middle_point = round(qTower.recordCount/2)>
-
 <cfset middle_record = queryGetRow(qTower, middle_point)>
 
-<cfset geoJson = createobject("component", "SerializeGeoJson").getPoints(URL.pl_number)>
-<cfset file_name = "geojson_towers_#URL.pl_number#.geojson">
-<cffile action="write" file="#expandpath(file_name)#" output="var towers = #geoJson#" nameconflict="overwrite" />
+<cfset SESSION.centr_point = [qTower.LONGX, qTower.LAT]>
 
-<cfset geoJson = createobject("component", "SerializeGeoJson").getSpans(URL.pl_number)>
+<cfset geoJsonTowers = createobject("component", "SerializeGeoJson").getPoints(URL.pl_number)>
+<cfset file_name = "geojson_towers_#URL.pl_number#.geojson">
+<cffile action="write" file="#expandpath(file_name)#" output="var towers = #geoJsonTowers#" nameconflict="overwrite" />
+
+<cfset geoJsonSpans = createobject("component", "SerializeGeoJson").getSpans(URL.pl_number)>
 <cfset file_name = "geojson_spans_#URL.pl_number#.geojson">
-<cffile action="write" file="#expandpath(file_name)#" output="var spans = #geoJson#" nameconflict="overwrite" />
+<cffile action="write" file="#expandpath(file_name)#" output="var spans = #geoJsonSpans#" nameconflict="overwrite" />
+
+<cfset geoJsonLine = createobject("component", "SerializeGeoJson").getLine(URL.pl_number)>
+<cfset file_name = "geojson_line_#URL.pl_number#.geojson">
+<cffile action="write" file="#expandpath(file_name)#" output="var line = #geoJsonLine#" nameconflict="overwrite" />
 
 <!---<cfdump var="#qTower#">
 <cfabort>

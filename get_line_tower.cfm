@@ -111,7 +111,7 @@ ORDER BY    qSpan.TOWER_NO
 </cfquery>
 
 <cfdump var="#qSpanTower#">
---->
+
 
 
 
@@ -148,3 +148,7 @@ ORDER BY    qSpan.TOWER_NO
 
 
 </cfloop>
+
+
+
+--->

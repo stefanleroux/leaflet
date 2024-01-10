@@ -15,6 +15,46 @@
 
         <cfset var qRead = "">
 
+
+        <cfquery name="qLine" datasource="postgis">
+        SELECT
+            "PL_NO", 
+            "PL_START", 
+            "PL_END", 
+            "LINE_NO", 
+            "D_VOLT", 
+            "O_VOLT", 
+            "SERV_WID", 
+            "LENGTH", 
+            "PLANT_ID", 
+            "CLNC_OLD", 
+            "STATUS", 
+            "LAT1", 
+            "LONG1", 
+            "LAT2", 
+            "LONG2", 
+            "LEGAL_AUDIT", 
+            "LATM", 
+            "LONGM", 
+            "AUDIT_DATE", 
+            "TECH_AUDIT", 
+            "ID", 
+            "BIRD_STATUS", 
+            "OPTIC_FIBRE", 
+            "CIRCUIT", 
+            "STANDARD_LABEL", 
+            "FLOC_ID", 
+            "SERIES_CAPACITOR", 
+            "AS_BUILT_DOC_REF", 
+            "AS_BUILT_CHECK", 
+            "COMMENTS", 
+            "CLNC"
+        FROM
+            mts_line
+        WHERE
+            "PL_NO" = <cfqueryparam cfsqltype="bigint" value="#ARGUMENTS.power_line_number#" />
+        </cfquery>
+
         <cfquery name="qRead" datasource="postgis">
         SELECT
             "TWR_PREF",
@@ -40,29 +80,34 @@
         ORDER BY
             "TOWER_NO"
         </cfquery>
-        
-        <cfset var geoJsonObject = [:]>
-        <cfset geoJsonObject["type"] = "FeatureCollection">
-        <cfset geoJsonObject["features"] = []>
 
-        <cfloop query="qRead">
-            <cfset feature = structnew("ordered")>
-            <cfset feature["type"] = "Feature">
-            <cfset feature["geometry"] = [:]>
-            <cfset feature["geometry"]["type"] = "Point">
-            <cfset feature["geometry"]["coordinates"] = []>
-            <cfset feature["geometry"]["coordinates"][1] = qRead.LONGX>
-            <cfset feature["geometry"]["coordinates"][2] = qRead.LAT>
-            <cfset feature["geometry"]["coordinates"][3] = qRead.HEIGHT>
-            <cfset feature["properties"] = [:]>
-            <cfset feature["properties"]["item"] = "Tower">
-            <cfset feature["properties"]["prefix"] = toString(qRead.TOWER_NO)>
-            <cfset feature["properties"]["number"] = qRead.TOWER_NO>
-            <cfset feature["properties"]["status"] = "Active">
-            <cfset arrayappend(geoJsonObject["features"], feature)>
-        </cfloop>
+        <cfset var  geoJsonLineString = structNew("ordered")>
+        <cfset var  geoJsonLineString["type"] = "FeatureCollection">
+        <cfset var  geoJsonLineString["features"] = arraynew(1)>
         
-        <cfreturn toString(serializeJSON(geoJsonObject), "UTF-8")>
+        <cfset feature = structnew("ordered")>
+        <cfset feature["type"] = "Feature">
+        <cfset feature["geometry"] = [:]>
+        <cfset feature["geometry"]["type"] = "LineString">
+        <cfset feature["geometry"]["coordinates"] = []>
+        <cfloop query="qRead">
+            <cfset point = [qRead.LONGX, qRead.LAT, qRead.HEIGHT]>
+            <cfset arrayappend(feature["geometry"]["coordinates"], point)>
+        </cfloop>
+
+        <cfset feature["properties"] = queryGetRow(qLine,1)>
+        <!--- <cfset feature["properties"]["item"] = "Line">
+        <cfset feature["properties"]["prefix"] = toString(qRead.TOWER_NO)>
+        <cfset feature["properties"]["number"] = qRead.TOWER_NO>
+        <cfset feature["properties"]["status"] = "Active"> --->
+
+
+        <cfset arrayappend(geoJsonLineString["features"], feature)>
+
+        <!--- <cfdump var="#geoJsonLineString#">
+        <cfabort> --->
+        
+        <cfreturn toString(serializeJSON(geoJsonLineString), "UTF-8")>
         
         <!---<cfdump var="#geoJsonObject#">--->
 

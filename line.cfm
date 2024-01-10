@@ -1,4 +1,50 @@
-<!doctype html>
+
+
+
+
+
+
+<cfset myLine = '{
+  "type": "FeatureCollection",
+  "features": [
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [
+            [-122.271154, 37.804348],
+            [-122.272057, 37.80295],
+            [-122.272057, 37.80295],
+            [-122.278011, 37.805288]
+          ]
+        },
+        "properties": {}
+      }
+  ]
+}'>
+
+
+
+
+
+
+<cfdump var="#deserializejson(myLine)#">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--- <!doctype html>
 <html lang="en">
 
 
@@ -99,4 +145,4 @@ var overlayMaps = {
   
   L.control.layers(basemaps, overlayMaps).addTo(map);
 
-</script>
+</script> --->

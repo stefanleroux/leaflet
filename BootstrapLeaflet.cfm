@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 
-    <cfparam name="URL.pl_number" type="numeric" default="8" />
+    <cfparam name="URL.pl_number" type="numeric" default="280" />
 
     <cfquery name="qTower" datasource="postgis">
         SELECT
@@ -43,31 +43,48 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Bootstrap demo</title>
     <link rel="stylesheet" href="leaflet/dist/leaflet.css" />
-   
+    <link rel="stylesheet" href="css/" />
+    <link rel="stylesheet" href="css/bootstrap.min.css" />
     <style>
-      #map { width: 750px; height: 250px; }
+      #map { width: 100%; height: 550px; }
     </style>
 
   </head>
   <body>
 
 
+    
+<div class="container">
+    <div class="row">
+        <div class="col-sm-12">
+            <div id="map"></div>
+        </div>
+    </div>
 
+    <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">Feature details</button>
 
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="offcanvasRightLabel">Feature details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+      </div>
+      <div class="offcanvas-body">
+        ...
+      </div>
+    </div>
 
-<div id="map" style="width:100%;height:500px;"></div>
-
+</div>
 
 
 <script src="leaflet/dist/leaflet.js"></script>
-
+<script src="leaflet/dist/plugins/Control.FullScreen.jss"></script>
 
 <cfoutput>
-  <script src="geojson_towers_#URL.pl_number#.geojson"></script>
+<script src="geojson_towers_#URL.pl_number#.geojson"></script>
 <script src="geojson_spans_#URL.pl_number#.geojson"></script>
-<script src="geojson_line_#URL.pl_number#.geojson"></script>
+<script src="geojson_line_STATIC.geojson" type="text/javascript"></script>
 </cfoutput>
-
+<script src="js/bootstrap.bundle.min.js" type="text/javascript"></script>
 
 <script>
 
@@ -98,8 +115,7 @@ function onEachSpan(feature, layer) {
     selection = e.target;
     selectedLayer = layer;
     selectedFeature = feature;
-    //map.fitBounds(layer.getBounds());
-    map.flyToBounds(layer.getBounds(), 12);
+
     //if(selectedFeature.filter())
 
     /*e.target.feature.properties.selected = true;
@@ -195,16 +211,6 @@ var basemaps = {
   };
   
   L.control.layers(basemaps, overlayMaps).addTo(map);
-  L.control.scale().addTo(map);
-
-<!---
-setInterval(function(){
-    map.setView([0, 0]);
-    setTimeout(function(){
-        map.setView([60, 0]);
-    }, 2000);
-}, 4000);
---->
 
 
 </script>
