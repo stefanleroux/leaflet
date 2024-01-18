@@ -67,7 +67,7 @@
 <script src="geojson_spans_#URL.pl_number#.geojson"></script>
 <script src="geojson_line_#URL.pl_number#.geojson"></script>
 </cfoutput>
-
+<script src="geojson_sites_ALL.geojson"></script>
 
 <script>
 
@@ -85,9 +85,11 @@
   var selectedLayer;
   var selectedFeature;
 
-  var geojsonLineGroup = L.layerGroup().addTo(map);
-  var geojsonSpanGroup = L.layerGroup().addTo(map);
-  var geojsonTowerGroup = L.layerGroup().addTo(map);
+
+  var geojsonLineGroup = L.layerGroup();
+  var geojsonSpanGroup = L.layerGroup();
+  var geojsonTowerGroup = L.layerGroup();
+  var geojsonSiteGroup = L.layerGroup();
     
     
 
@@ -123,9 +125,16 @@ function onEachSpan(feature, layer) {
 
 
 function onEachTower(feature, layer) {
+    layer.on('click', function(e) {
+
+      //layer.bindPopup(feature.properties.LENGTH);
+      console.log(layer);
+      //L.DomEvent.stopPropagation(e);
+  });
   //console.log(layer);
   // does this feature have a property named popupContent?
   layer.bindPopup("Wow!");
+  //layer.draggable = true;
   geojsonTowerGroup.addLayer(layer);
 }
 
@@ -133,19 +142,25 @@ function onEachLine(feature, layer) {
   layer.on('click', function(e) {
       e.target.setStyle({
           stroke: true,
-          color: 'gold',
-          weight: 7,
-          opacity: 0.7,
+          color: "#FF10F0",
+          //weight: 7,
+          //opacity: 1,
         });
       //layer.bindPopup(feature.properties.LENGTH);
-      console.log(layer);
+      //console.log(feature);
       //L.DomEvent.stopPropagation(e);
-  });
-
+    });
   geojsonLineGroup.addLayer(layer);
-  //var bounds = layer.getBounds();
-  //var latLng = bounds.getCenter();
-  //map.setView(latLng, 12.5);
+  var bounds = layer.getBounds();
+  map.fitBounds(bounds);
+}
+
+
+function onEachSite(feature, layer) {
+  layer.on('click', function(e) {
+        //console.log(layer);
+    });
+    layer.bindPopup(feature.properties.site_type);
 }
 
 // create and add osm tile layer
@@ -163,22 +178,43 @@ var osmHumanitarian = L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}
 
 //supplied by memomaps.de
 var OPNVKarte = L.tileLayer('https://tileserver.memomaps.de/tilegen/{z}/{x}/{y}.png', {
-	maxZoom: 18,
+	maxZoom: 19,
 	attribution: 'Map <a href="https://memomaps.de/">memomaps.de</a> <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 });
 
 
+var line_400V = {
+  "color": "#39FF14",
+  //"weight": 10
+};
 
 L.geoJSON(line, {
-  onEachFeature: onEachLine
+  onEachFeature: onEachLine,
+   
 }).addTo(map);
 
+var geojsonMarkerOptions = {
+    radius: 8,
+    fillColor: "#000",
+    color: "#000",
+    weight: 1,
+    opacity: 1,
+    fillOpacity: 0.8
+};
+
 L.geoJSON(towers, {
-  onEachFeature: onEachTower
-}).addTo(map);
+  onEachFeature: onEachTower,
+  pointToLayer: function (feature, latlng) {
+        return L.circleMarker(latlng, geojsonMarkerOptions);
+    }
+})
 
 L.geoJSON(spans, {
     onEachFeature: onEachSpan
+})
+
+L.geoJSON(sites, {
+    onEachFeature: onEachSite
 }).addTo(map);
 
 
@@ -188,23 +224,16 @@ var basemaps = {
   "OSM Humanitarian": osmHumanitarian
 };
 
-  var overlayMaps = {
-    "Line": geojsonLineGroup,
-    "Towers": geojsonTowerGroup,
-    "Spans": geojsonSpanGroup
-  };
+var overlayMaps = {
+  "Line": geojsonLineGroup,
+  "Towers": geojsonTowerGroup,
+  "Spans": geojsonSpanGroup,
+  "Sites": geojsonSiteGroup
+};
   
   L.control.layers(basemaps, overlayMaps).addTo(map);
   L.control.scale().addTo(map);
 
-<!---
-setInterval(function(){
-    map.setView([0, 0]);
-    setTimeout(function(){
-        map.setView([60, 0]);
-    }, 2000);
-}, 4000);
---->
 
 
 </script>

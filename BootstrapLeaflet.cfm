@@ -43,8 +43,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Bootstrap demo</title>
     <link rel="stylesheet" href="leaflet/dist/leaflet.css" />
-    <link rel="stylesheet" href="css/" />
     <link rel="stylesheet" href="css/bootstrap.min.css" />
+    <script src="htmx/dist/htmx.min.js"></script>
     <style>
       #map { width: 100%; height: 550px; }
     </style>
@@ -61,30 +61,36 @@
         </div>
     </div>
 
-    <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">Feature details</button>
+    <button class="btn btn-primary"
+            type="button"
+            data-bs-toggle="offcanvas"
+            data-bs-target="#featureDetailsRight"
+            aria-controls="featureDetailsRight"
+            hx-get="details/?tnid=11"
+            hx-target="#feature_details"
+            hx-swap="innerHTML">Feature details
+    </button>
 
-    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="featureDetailsRight" aria-labelledby="offcanvasRightLabel">
       <div class="offcanvas-header">
         <h5 class="offcanvas-title" id="offcanvasRightLabel">Feature details</h5>
         <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
       </div>
-      <div class="offcanvas-body">
-        ...
-      </div>
+      <div class="offcanvas-body" id="feature_details"></div>
     </div>
 
 </div>
 
 
 <script src="leaflet/dist/leaflet.js"></script>
-<script src="leaflet/dist/plugins/Control.FullScreen.jss"></script>
+<script src="js/leaflet/dist/leaflet.textpath.js"></script>
 
 <cfoutput>
 <script src="geojson_towers_#URL.pl_number#.geojson"></script>
 <script src="geojson_spans_#URL.pl_number#.geojson"></script>
 <script src="geojson_line_STATIC.geojson" type="text/javascript"></script>
 </cfoutput>
-<script src="js/bootstrap.bundle.min.js" type="text/javascript"></script>
+<script src="js/bootstrap/bootstrap.bundle.min.js" type="text/javascript"></script>
 
 <script>
 
@@ -94,9 +100,10 @@
       var lineLon = #middle_record.LONGX#;
   </cfoutput>
 
-  var map = L.map('map').setView([lineLat, lineLon], 14); // Set the initial center and zoom level
-
-
+  var map = L.map('map').setView([lineLat, lineLon], 13); // Set the initial center and zoom level
+  const myFeatureProperties = document.getElementById("featureDetailsRight");
+  var propsOffcanvas = new bootstrap.Offcanvas(myFeatureProperties);
+  const myFeaturePropertiesLabel = document.getElementById("offcanvasRightLabel");
   
   var selection;
   var selectedLayer;
@@ -104,7 +111,7 @@
 
   var geojsonLineGroup = L.layerGroup().addTo(map);
   var geojsonSpanGroup = L.layerGroup().addTo(map);
-  var geojsonTowerGroup = L.layerGroup().addTo(map);
+  var geojsonTowerGroup = L.layerGroup();//.addTo(map);
     
     
 
@@ -139,9 +146,11 @@ function onEachSpan(feature, layer) {
 
 
 function onEachTower(feature, layer) {
-  //console.log(layer);
-  // does this feature have a property named popupContent?
-  layer.bindPopup("Wow!");
+  layer.on('click', function(e) {
+    htmx.ajax('GET', 'details/?tnid='+feature.properties.number, '#feature_details');
+    myFeaturePropertiesLabel.innerHTML = feature.properties.item;
+    propsOffcanvas.show();
+  });
   geojsonTowerGroup.addLayer(layer);
 }
 
@@ -156,8 +165,10 @@ function onEachLine(feature, layer) {
       //layer.bindPopup(feature.properties.LENGTH);
       console.log(layer);
       //L.DomEvent.stopPropagation(e);
-  });
+  }); 
 
+  console.log(layer);
+  layer.setText('Woooooow', {center: true, attributes: {stroke: 'black'}});
   geojsonLineGroup.addLayer(layer);
   //var bounds = layer.getBounds();
   //var latLng = bounds.getCenter();
@@ -191,7 +202,7 @@ L.geoJSON(line, {
 
 L.geoJSON(towers, {
   onEachFeature: onEachTower
-}).addTo(map);
+})//.addTo(map);
 
 L.geoJSON(spans, {
     onEachFeature: onEachSpan

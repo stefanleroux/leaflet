@@ -1,6 +1,6 @@
 
 
-<cfquery name="qLine" datasource="postgis">
+<cfquery name="qLine" datasource="postgis" maxrows="10">
     SELECT
 	mts_line."PL_NO",
 	mts_line."PL_START",

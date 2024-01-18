@@ -87,29 +87,22 @@
         
         <cfset feature = structnew("ordered")>
         <cfset feature["type"] = "Feature">
-        <cfset feature["geometry"] = [:]>
+        <cfset feature["geometry"] = structnew("ordered")>
         <cfset feature["geometry"]["type"] = "LineString">
-        <cfset feature["geometry"]["coordinates"] = []>
+        <cfset feature["geometry"]["coordinates"] = arraynew(1)>
         <cfloop query="qRead">
             <cfset point = [qRead.LONGX, qRead.LAT, qRead.HEIGHT]>
             <cfset arrayappend(feature["geometry"]["coordinates"], point)>
         </cfloop>
 
-        <cfset feature["properties"] = queryGetRow(qLine,1)>
-        <!--- <cfset feature["properties"]["item"] = "Line">
-        <cfset feature["properties"]["prefix"] = toString(qRead.TOWER_NO)>
-        <cfset feature["properties"]["number"] = qRead.TOWER_NO>
-        <cfset feature["properties"]["status"] = "Active"> --->
-
+         <cfset feature["properties"]["item"] = "Transmission Line">
+         <cfset feature["properties"]["item_selected"] = false>
+         <cfset VARIABLES.props = queryGetRow(qLine,1)>
+         <cfset structAppend(feature["properties"], VARIABLES.props, true)>
 
         <cfset arrayappend(geoJsonLineString["features"], feature)>
-
-        <!--- <cfdump var="#geoJsonLineString#">
-        <cfabort> --->
         
         <cfreturn toString(serializeJSON(geoJsonLineString), "UTF-8")>
-        
-        <!---<cfdump var="#geoJsonObject#">--->
 
     </cffunction>
 
@@ -172,7 +165,7 @@
     </cffunction>
 
 
-
+    <!--- FEATURE: SPANS --->
     <cffunction name="getSpans" access="public" returntype="string" returnformat="JSON">
         <cfargument name="power_line_number" type="numeric" required="true">
 
@@ -269,6 +262,53 @@
         <cfreturn toString(serializeJSON(geoJsonObject), "UTF-8")>
         
         <!---<cfdump var="#geoJsonObject#">--->
+
+    </cffunction>
+
+
+
+
+
+
+    <!--- FEATURE: SITES --->
+    <cffunction name="getSites" access="public" returntype="string" returnformat="JSON">
+
+        <cfset var  geoJsonObject = structNew("ordered")>
+        <cfset var  geoJsonObject["type"] = "FeatureCollection">
+        <cfset var  geoJsonObject["features"] = arraynew(1)>
+        
+        <cfquery name="qSites" datasource="postgis">
+        SELECT
+            site_name, 
+            site_type, 
+            date_captured, 
+            site_no, 
+            lat, 
+            longx,
+            clnc_old, 
+            voltage, 
+            facility_id, 
+            abbrev, 
+            floc_id, 
+            clnc
+        FROM
+            txs_site
+            --where site_no = 2199
+        </cfquery>
+
+        <cfloop query="qSites">
+            <cfset currentSite = queryGetRow(qSites,qSites.currentrow)>
+            <cfset feature = structnew("ordered")>
+            <cfset feature["type"] = "Feature">
+            <cfset feature["geometry"] = structNew("ordered")>
+            <cfset feature["geometry"]["type"] = "Point">
+            <cfset feature["geometry"]["coordinates"] = [currentSite.longx, currentSite.lat]>
+            <cfset feature["properties"] = currentSite>
+            <cfset arrayappend(geoJsonObject["features"], feature)>
+        </cfloop>
+
+        <cfreturn toString(serializeJSON(geoJsonObject), "UTF-8")>
+        <!--- <cfabort> --->
 
     </cffunction>
 

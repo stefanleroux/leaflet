@@ -50,6 +50,10 @@ ORDER BY
 <cfset file_name = "geojson_line_#URL.pl_number#.geojson">
 <cffile action="write" file="#expandpath(file_name)#" output="var line = #geoJsonLine#" nameconflict="overwrite" />
 
+<cfset geoJsonSites = createobject("component", "SerializeGeoJson").getSites()>
+<cfset file_name = "geojson_sites_ALL.geojson">
+<cffile action="write" file="#expandpath(file_name)#" output="var sites = #geoJsonSites#" nameconflict="overwrite" />
+
 <!---<cfdump var="#qTower#">
 <cfabort>
 --->
