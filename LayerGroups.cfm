@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 
-    <cfparam name="URL.pl_number" type="numeric" default="8" />
+    <cfparam name="URL.pl_number" type="numeric" default="18" />
 
     <cfquery name="qTower" datasource="postgis">
         SELECT
@@ -101,7 +101,8 @@ function onEachSpan(feature, layer) {
     selectedLayer = layer;
     selectedFeature = feature;
     //map.fitBounds(layer.getBounds());
-    map.flyToBounds(layer.getBounds(), 12);
+    //map.flyToBounds(layer.getBounds(), 12);
+    
     //if(selectedFeature.filter())
 
     /*e.target.feature.properties.selected = true;
@@ -114,21 +115,15 @@ function onEachSpan(feature, layer) {
     console.log(selection);
     //L.DomEvent.stopPropagation(e);  
   });
-  layer.setStyle({
-      stroke: true,
-      color: layer.feature.properties.color,
-      weight: 5,
-      opacity: 0.7,
-  });
-  geojsonSpanGroup.addLayer(layer);
+
 }
 
 
 function onEachTower(feature, layer) {
     layer.on('click', function(e) {
-
+      
       //layer.bindPopup(feature.properties.LENGTH);
-      console.log(layer);
+      //console.log(layer);
       //L.DomEvent.stopPropagation(e);
   });
   //console.log(layer);
@@ -151,8 +146,9 @@ function onEachLine(feature, layer) {
       //L.DomEvent.stopPropagation(e);
     });
   geojsonLineGroup.addLayer(layer);
-  var bounds = layer.getBounds();
-  map.fitBounds(bounds);
+  //var bounds = layer.getBounds();
+  //map.fitBounds(bounds);
+
 }
 
 
@@ -189,8 +185,7 @@ var line_400V = {
 };
 
 L.geoJSON(line, {
-  onEachFeature: onEachLine,
-   
+  onEachFeature: onEachLine
 }).addTo(map);
 
 var geojsonMarkerOptions = {
@@ -207,11 +202,11 @@ L.geoJSON(towers, {
   pointToLayer: function (feature, latlng) {
         return L.circleMarker(latlng, geojsonMarkerOptions);
     }
-})
+});
 
 L.geoJSON(spans, {
     onEachFeature: onEachSpan
-})
+});
 
 L.geoJSON(sites, {
     onEachFeature: onEachSite

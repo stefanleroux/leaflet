@@ -39,22 +39,23 @@ ORDER BY
 <cfset SESSION.centr_point = [qTower.LONGX, qTower.LAT]>
 
 <cfset geoJsonTowers = createobject("component", "SerializeGeoJson").getPoints(URL.pl_number)>
-<cfset file_name = "geojson_towers_#URL.pl_number#.geojson">
+<cfset file_name = "geojson_tower_#URL.pl_number#.geojson">
 <cffile action="write" file="#expandpath(file_name)#" output="var towers = #geoJsonTowers#" nameconflict="overwrite" />
 
 <cfset geoJsonSpans = createobject("component", "SerializeGeoJson").getSpans(URL.pl_number)>
-<cfset file_name = "geojson_spans_#URL.pl_number#.geojson">
+<cfset file_name = "geojson_span_#URL.pl_number#.geojson">
 <cffile action="write" file="#expandpath(file_name)#" output="var spans = #geoJsonSpans#" nameconflict="overwrite" />
 
 <cfset geoJsonLine = createobject("component", "SerializeGeoJson").getLine(URL.pl_number)>
 <cfset file_name = "geojson_line_#URL.pl_number#.geojson">
 <cffile action="write" file="#expandpath(file_name)#" output="var line = #geoJsonLine#" nameconflict="overwrite" />
 
+<!---
 <cfset geoJsonSites = createobject("component", "SerializeGeoJson").getSites()>
 <cfset file_name = "geojson_sites_ALL.geojson">
 <cffile action="write" file="#expandpath(file_name)#" output="var sites = #geoJsonSites#" nameconflict="overwrite" />
 
-<!---<cfdump var="#qTower#">
+<cfdump var="#qTower#">
 <cfabort>
 --->
 

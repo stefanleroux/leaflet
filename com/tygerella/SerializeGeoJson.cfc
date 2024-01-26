@@ -13,6 +13,7 @@
         <cfargument name="power_line_number" type="numeric" required="true">
 
         <cfset var qRead = "">
+        <cfset var lineColor = "##000">
 
         <cfquery name="qLine" datasource="postgis">
         SELECT
@@ -93,43 +94,13 @@
             <cfset arrayappend(feature["geometry"]["coordinates"], point)>
         </cfloop>
 
-        <cfswitch expression="#qLine.O_VOLT#">
-            <cfcase value="800">
-                <cfset line_color = "">
-            </cfcase>
-            <cfcase value="765">
-                <cfset line_color = "">
-            </cfcase>
-            <cfcase value="533">
-                <cfset line_color = "">
-            </cfcase>
-            <cfcase value="400">
-                <cfset line_color = "">
-            </cfcase>
-            <cfcase value="275">
-                <cfset line_color = "">
-            </cfcase>
-            <cfcase value="220">
-                <cfset line_color = "">
-            </cfcase>
-            <cfcase value="132">
-                <cfset line_color = "">
-            </cfcase>
-            <cfcase value="110">
-                <cfset line_color = "">
-            </cfcase>
-            <cfcase value="88">
-                <cfset line_color = "">
-            </cfcase>
-            <cfdefaultcase>
-                <cfset line_color = "##999">
-            </cfdefaultcase>
-        </cfswitch>
-
-
+        <cfset lineColor = getVoltageItemColor(qLine.O_VOLT)>
 
         <cfset feature["properties"]["item"] = "Transmission Line">
         <cfset feature["properties"]["item_selected"] = false>
+        <cfset feature["properties"]["item_color"] = lineColor>
+
+        
         <cfset VARIABLES.props = queryGetRow(qLine,1)>
         <cfset structAppend(feature["properties"], VARIABLES.props, true)>
 
@@ -185,12 +156,12 @@
             <cfset feature["geometry"]["coordinates"] = []>
             <cfset feature["geometry"]["coordinates"][1] = qRead.LONGX>
             <cfset feature["geometry"]["coordinates"][2] = qRead.LAT>
-            <cfset feature["geometry"]["coordinates"][3] = qRead.HEIGHT>
+            <!--- <cfset feature["geometry"]["coordinates"][3] = qRead.HEIGHT> --->
             <!--- FEATURE PROPERTIES --->
             <cfset feature["properties"] = [:]>
             <cfset feature["properties"]["item"] = "Tower">
             <cfset feature["properties"]["item_selected"] = false>
-            <cfset VARIABLES.props = queryGetRow(qRead,1)>
+            <cfset VARIABLES.props = queryGetRow(qRead,qRead.currentrow)>
             <cfset structAppend(feature["properties"], VARIABLES.props, true)>
             <cfset arrayappend(geoJsonObject["features"], feature)>
         </cfloop>
@@ -207,6 +178,7 @@
 
         <cfset var qRead = "">
         <cfset var report_error = false>
+        <cfset lineColor = "##000">
 
         <cfquery name="qRead" datasource="postgis">
         SELECT      "TWR_PREF",
@@ -231,7 +203,7 @@
                     "TWR_END" ASC
         </cfquery>
 
-        <cfquery name="qTower" datasource="postgis">
+        <cfquery name="qTower" datasource="postgis" cachedwithin="#createtimespan(0,1,0,0)#">
         SELECT      "PL_NO",
                     "LAT", 
                     "LONGX", 
@@ -253,19 +225,18 @@
             
             <cftry>
                 <cfquery name="qTowerStart" dbtype="query" maxrows="1" timeout="300">
-                SELECT	LAT, LONGX, HEIGHT
+                SELECT	LAT, LONGX
                 FROM 	qTower
                 WHERE	"PL_NO" = <cfqueryparam cfsqltype="bigint" value="#ARGUMENTS.power_line_number#" />
                 AND		"TOWER_NO" = <cfqueryparam cfsqltype="bigint" value="#qRead.TWR_START#" />
                 </cfquery>
             
                 <cfquery name="qTowerEnd" dbtype="query" maxrows="1" timeout="300">
-                SELECT	LAT, LONGX, HEIGHT
+                SELECT	LAT, LONGX
                 FROM	qTower
                 WHERE	"PL_NO" = <cfqueryparam cfsqltype="bigint" value="#ARGUMENTS.power_line_number#" />
                 AND		"TOWER_NO" = <cfqueryparam cfsqltype="bigint" value="#qRead.TWR_END#" />
-                </cfquery>
-            
+                </cfquery>            
             <cfcatch>
                 <cfset report_error = true>
                 <cfbreak />
@@ -274,10 +245,10 @@
 
             <cfset spanArr = arraynew()>
             <cfset towerArr = arraynew()>
-            <cfif currentrow mod 2 eq 1>
-                <cfset span_color = "yellow">
+            <cfif qRead.currentrow mod 2 eq 1>
+                <cfset span_highlight = true>
             <cfelse>
-                <cfset span_color = "green">
+                <cfset span_highlight = false>
             </cfif>
             <!---
             <cfoutput>
@@ -291,10 +262,16 @@
 
             <cfset feature["geometry"]["coordinates"] = towerArr>
 
+            <cfset lineColor = getVoltageItemColor(qLine.O_VOLT)>
+
             <cfset feature["properties"] = [:]>
             <cfset feature["properties"]["item"] = "Span">
-            <cfset feature["properties"]["selected"] = false>            
-            <cfset feature["properties"]["color"] = span_color>
+            <cfset feature["properties"]["selected"] = false>
+            
+            <cfset feature["properties"]["highlight"] = span_highlight>
+
+            <cfset VARIABLES.props = queryGetRow(qRead,qRead.currentrow)>
+            <cfset structAppend(feature["properties"], VARIABLES.props, true)>
 
             <cfset arrayappend(geoJsonObject["features"], feature)>
         </cfloop>
@@ -349,6 +326,54 @@
 
         <cfreturn toString(serializeJSON(geoJsonObject), "UTF-8")>
         <!--- <cfabort> --->
+
+    </cffunction>
+
+
+
+
+    <cffunction name="getVoltageItemColor" access="private" returntype="string">
+        <cfargument name="voltage" type="string" required="true" />
+        
+        <cfswitch expression="#arguments.voltage#">
+            <cfcase value="800">
+                <cfset line_color = "##000">
+            </cfcase>
+            <cfcase value="765">
+                <cfset line_color = "##BF00FF">
+            </cfcase>
+            <cfcase value="533">
+                <!--- yellow --->
+                <cfset line_color = "##FFFF00">
+            </cfcase>
+            <cfcase value="400">
+                <!--- green --->
+                <cfset line_color = "##72FF13">
+            </cfcase>
+            <cfcase value="275">
+                <!--- orange --->
+                <cfset line_color = "##FF5E00">
+            </cfcase>
+            <cfcase value="220">
+                <!--- purple --->
+                <cfset line_color = "##bf00ff">
+            </cfcase>
+            <cfcase value="132">
+                <!--- blue --->
+                <cfset line_color = "##7df9ff">
+            </cfcase>
+            <cfcase value="110">
+                <cfset line_color = "##000">
+            </cfcase>
+            <cfcase value="88">
+                <cfset line_color = "##000">
+            </cfcase>
+            <cfdefaultcase>
+                <cfset line_color = "##999">
+            </cfdefaultcase>
+        </cfswitch>
+
+        <cfreturn line_color />
 
     </cffunction>
 

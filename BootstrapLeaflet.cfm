@@ -135,12 +135,6 @@ function onEachSpan(feature, layer) {
     console.log(selection);
     //L.DomEvent.stopPropagation(e);  
   });
-  layer.setStyle({
-      stroke: true,
-      color: layer.feature.properties.color,
-      weight: 5,
-      opacity: 0.7,
-  });
   geojsonSpanGroup.addLayer(layer);
 }
 
@@ -158,17 +152,23 @@ function onEachLine(feature, layer) {
   layer.on('click', function(e) {
       e.target.setStyle({
           stroke: true,
-          color: 'gold',
+          color: '#fe01b1',
           weight: 7,
           opacity: 0.7,
         });
+        console.log("Line click!!!");
       //layer.bindPopup(feature.properties.LENGTH);
       console.log(layer);
       //L.DomEvent.stopPropagation(e);
   }); 
 
-  console.log(layer);
-  layer.setText('Woooooow', {center: true, attributes: {stroke: 'black'}});
+  layer.setStyle({
+      stroke: true,
+      color: '#65FE08',
+      weight: 5,
+      opacity: 0.7,
+  });
+  layer.setText('Woooooow', { attributes: {stroke: 'black'}});
   geojsonLineGroup.addLayer(layer);
   //var bounds = layer.getBounds();
   //var latLng = bounds.getCenter();

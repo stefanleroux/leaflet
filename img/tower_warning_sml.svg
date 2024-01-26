@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="0 0 360 360" style="width: 56px; height: 56px; opacity: 1;" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style type="text/css">
+
+.warning_zone {
+
+    fill:
+    -moz-transition:all 0.5s ease-in-out;
+    -webkit-transition:all 0.5s ease-in-out;
+    -o-transition:all 0.5s ease-in-out;
+    -ms-transition:all 0.5s ease-in-out;
+    transition:all 0.5s ease-in-out;
+    -moz-animation:blink normal 1.5s infinite ease-in-out;
+    /* Firefox */
+    -webkit-animation:blink normal 1.5s infinite ease-in-out;
+    /* Webkit */
+    -ms-animation:blink normal 1.5s infinite ease-in-out;
+    /* IE */
+    animation:blink normal 1.5s infinite ease-in-out;
+    /* Opera */
+}
+.blink{
+  border:1px solid black;
+  animation: blink 5s linear infinite; animation-timing-function: ease-in, ease-in-out;}
+
+@keyframes blink {
+    0% {
+           fill: rgba(253,185,21,1)
+    }
+    50% {
+           fill: rgba(253,185,21,0.2)
+    }
+    100% {
+           fill: rgba(253,185,21,1)
+    }
+}
+@-webkit-keyframes blink {
+    0% {
+           fill: rgba(253,185,21,1)
+    }
+    50% {
+           fill: rgba(253,185,21,0.2)
+    }
+    100% {
+           fill: rgba(253,185,21,1)
+    }
+}
+
+</style>
+  </defs>
+  <g transform="matrix(1.5706479549407957, 0, 0, 1.5706479549407957, -433.9753787811901, -345.3613332712848)" style="">
+    <path class="warning_zone" d="M391.039,223.84c-19.199,0-37.277,4.878-53.038,13.442c-6.962,3.758-13.52,8.32-19.442,13.437 c-7.359,6.242-13.918,13.52-19.359,21.52c-6.797,9.844-12,20.882-15.278,32.722c-2.801,9.598-4.242,19.84-4.242,30.321 c0,4.636,0.321,9.277,0.879,13.758c1.762,14.48,6.32,28.082,13.043,40.242c2.801,5.038,6,9.839,9.519,14.32 c7.438,9.598,16.32,17.84,26.481,24.481c17.598,11.758,38.718,18.558,61.437,18.558c61.602,0,111.442-49.84,111.442-111.359 C502.48,273.68,452.64,223.84,391.039,223.84z M434.242,322.641l-11.281,17.121L381.84,402.32c-1.038,1.598-2.718,2.321-4.32,2.321 c-3.199,0-6.32-2.558-5.039-6.082l18.879-52.878l-40.321,6.238h-0.48c-2.238,0-3.836-2.078-2.797-3.918l11.519-20.32l12.078-21.199 l11.363-20l10.316-18.078c0.082-0.082,0.161-0.242,0.321-0.32c0.882-1.524,2.48-2.242,4.16-2.242c3.039,0,6.082,2.32,5.121,5.762 l-0.398,1.438l-5.839,21.043l-3.442,12.398l-3.305,12.066l-1.27,4.414l0.062-0.008l-0.046,0.168l42.797-4.562 c0.16-0.078,0.32-0.078,0.402-0.078C433.922,318.481,435.52,320.801,434.242,322.641z"/>
+  </g>
+</svg>
